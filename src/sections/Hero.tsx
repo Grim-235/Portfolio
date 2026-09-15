@@ -8,14 +8,14 @@ interface HeroProps {
 
 const Hero = ({ onCursorEnter, onCursorLeave }: HeroProps) => {
   const [displayText, setDisplayText] = useState('');
-  const fullText = 'FULLSTACK DEVELOPER & AI SPECIALIST';
+  const fullText = 'SOFTWARE DEVELOPER & AI ENTHUSIAST';
   const containerRef = useRef<HTMLElement>(null);
-  
+
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ['start start', 'end start']
   });
-  
+
   const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
   const scale = useTransform(scrollYProgress, [0, 0.5], [1, 0.8]);
   const y = useTransform(scrollYProgress, [0, 0.5], [0, -100]);
@@ -70,7 +70,7 @@ const Hero = ({ onCursorEnter, onCursorLeave }: HeroProps) => {
       </div>
 
       {/* Main content */}
-      <motion.div 
+      <motion.div
         className="relative z-10 text-center px-6"
         style={{ y }}
       >
@@ -81,7 +81,7 @@ const Hero = ({ onCursorEnter, onCursorLeave }: HeroProps) => {
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 2.8, duration: 0.5 }}
         >
-          // SYSTEM.INIT()
+          
         </motion.div>
 
         {/* Main title with glitch effect */}
@@ -115,7 +115,7 @@ const Hero = ({ onCursorEnter, onCursorLeave }: HeroProps) => {
 
         {/* Animated line */}
         <motion.div
-          className="w-32 h-0.5 bg-gradient-to-r from-neon-cyan to-neon-pink mx-auto my-8"
+          className="w-32 h-0.5 bg-gradient-to-r from-neon-cyan via-white/50 to-neon-cyan mx-auto my-8"
           initial={{ width: 0 }}
           animate={{ width: 128 }}
           transition={{ delay: 3.4, duration: 0.8 }}
@@ -123,12 +123,12 @@ const Hero = ({ onCursorEnter, onCursorLeave }: HeroProps) => {
 
         {/* Typing subtitle */}
         <motion.div
-          className="font-rajdhani text-lg md:text-xl lg:text-2xl text-white/80 mb-4 h-8"
+          className="font-rajdhani text-lg md:text-xl lg:text-2xl text-white/80 mb-4 h-8 tracking-wider"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 3.6 }}
         >
-          <span className="text-neon-pink">&gt;</span> {displayText}
+          <span className="text-neon-cyan">&gt;</span> {displayText}
           <motion.span
             className="inline-block w-0.5 h-6 bg-neon-cyan ml-1"
             animate={{ opacity: [1, 0] }}
@@ -138,14 +138,14 @@ const Hero = ({ onCursorEnter, onCursorLeave }: HeroProps) => {
 
         {/* Description */}
         <motion.p
-          className="font-rajdhani text-base md:text-lg text-white/60 max-w-2xl mx-auto mb-12"
+          className="font-rajdhani text-base md:text-lg text-white/70 max-w-2xl mx-auto mb-12 leading-relaxed"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 3.8, duration: 0.5 }}
         >
-          2nd Year Computer Engineering Student specializing in{' '}
-          <span className="text-neon-cyan">AI-Assisted Rapid Development</span> &{' '}
-          <span className="text-neon-pink">Fullstack Engineering</span>
+          Computer Engineering student exploring{' '}
+          <span className="text-neon-cyan font-medium">Software Development</span>,{' '}
+          <span className="text-neon-cyan font-medium">AI & Automation</span>, and building tools to solve interesting problems.
         </motion.p>
 
         {/* CTA Buttons */}
@@ -165,13 +165,13 @@ const Hero = ({ onCursorEnter, onCursorLeave }: HeroProps) => {
           >
             VIEW PROJECTS
           </motion.button>
-          
+
           <motion.button
             className="relative px-10 py-4 font-orbitron text-sm tracking-[3px] text-white/70 border border-white/20 overflow-hidden cursor-none"
             onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
             onMouseEnter={onCursorEnter}
             onMouseLeave={onCursorLeave}
-            whileHover={{ scale: 1.05, borderColor: 'rgba(0, 245, 255, 0.5)' }}
+            whileHover={{ scale: 1.05, borderColor: 'rgba(143, 211, 244, 0.5)' }}
             whileTap={{ scale: 0.95 }}
           >
             <span className="relative z-10">GET IN TOUCH</span>
@@ -184,7 +184,7 @@ const Hero = ({ onCursorEnter, onCursorLeave }: HeroProps) => {
           </motion.button>
         </motion.div>
 
-        {/* Stats */}
+        {/* Badges / Focus indicators (Replaced fake exp with authentic active stats) */}
         <motion.div
           className="flex justify-center gap-8 md:gap-16 mt-16"
           initial={{ opacity: 0 }}
@@ -192,9 +192,9 @@ const Hero = ({ onCursorEnter, onCursorLeave }: HeroProps) => {
           transition={{ delay: 4.2, duration: 0.5 }}
         >
           {[
-            { value: '5+', label: 'PROJECTS' },
-            { value: '2', label: 'YEARS EXP' },
-            { value: '∞', label: 'PASSION' },
+            { value: '8+', label: 'PROJECTS' },
+            { value: '4', label: 'TECH DOMAINS' },
+            { value: '∞', label: 'CURIOSITY' },
           ].map((stat, index) => (
             <motion.div
               key={stat.label}

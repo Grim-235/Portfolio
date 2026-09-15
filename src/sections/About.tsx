@@ -1,5 +1,6 @@
-import { useRef } from 'react';
+import { useState, useRef } from 'react';
 import { motion, useScroll, useTransform, useInView } from 'framer-motion';
+import { Sparkles } from 'lucide-react';
 
 interface AboutProps {
   onCursorEnter: () => void;
@@ -7,164 +8,106 @@ interface AboutProps {
 }
 
 const About = ({ onCursorEnter, onCursorLeave }: AboutProps) => {
+  const [isActive, setIsActive] = useState(false);
   const containerRef = useRef<HTMLElement>(null);
   const isInView = useInView(containerRef, { once: true, margin: '-100px' });
-  
+
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ['start end', 'end start']
   });
-  
-  const y = useTransform(scrollYProgress, [0, 1], [100, -100]);
-  const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
 
-  const skills = [
-    { name: 'AI-Assisted Development', level: 95 },
-    { name: 'Fullstack Engineering', level: 60 },
-    { name: 'Prompt Engineering', level: 98 },
-    { name: 'Rapid Prototyping', level: 92 },
-  ];
+  const y = useTransform(scrollYProgress, [0, 1], [60, -60]);
+  const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
+  const scale = useTransform(scrollYProgress, [0, 0.25, 0.75, 1], [0.94, 1, 1, 0.94]);
 
   return (
     <motion.section
       ref={containerRef}
       id="about"
-      className="relative min-h-screen py-32 px-6"
-      style={{ opacity }}
+      className="relative min-h-screen py-32 px-6 flex items-center justify-center"
+      style={{ opacity, scale }}
     >
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-4xl mx-auto w-full">
         {/* Section header */}
         <motion.div
-          className="mb-20"
+          className="mb-14 text-center md:text-left"
           initial={{ opacity: 0, x: -50 }}
           animate={isInView ? { opacity: 1, x: 0 } : {}}
           transition={{ duration: 0.8 }}
         >
-          <div className="section-number mb-4">// 01.ABOUT</div>
+          <div className="section-number mb-4"></div>
           <h2 className="font-orbitron text-4xl md:text-6xl font-black">
             <span className="text-white">WHO </span>
             <span className="text-neon-cyan neon-glow">AM I?</span>
           </h2>
         </motion.div>
 
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
-          {/* Left content */}
+        {/* Main Content Card */}
+        <motion.div
+          style={{ y }}
+        >
           <motion.div
-            style={{ y }}
+            className={`group p-8 md:p-12 relative rounded-xl transition-all duration-500 cursor-pointer ${
+              isActive
+                ? 'bg-white/[0.02] border border-neon-cyan/50 shadow-[0_0_30px_rgba(143,211,244,0.2)]'
+                : 'bg-transparent border border-transparent hover:border-neon-cyan/40 hover:bg-white/[0.015] hover:shadow-[0_0_25px_rgba(143,211,244,0.15)]'
+            }`}
+            initial={{ opacity: 0, y: 40 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            onClick={() => setIsActive(!isActive)}
+            onMouseEnter={onCursorEnter}
+            onMouseLeave={onCursorLeave}
           >
-            {/* Main text */}
-            <motion.div
-              className="cyber-card p-8 mb-8 corner-accent"
-              initial={{ opacity: 0, y: 50 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              onMouseEnter={onCursorEnter}
-              onMouseLeave={onCursorLeave}
-            >
-              <p className="font-rajdhani text-lg md:text-xl text-white/80 leading-relaxed mb-6">
-                Hello! I'm <span className="text-neon-cyan font-semibold">Devansh Wartakar</span>, 
-                a dedicated student currently pursuing my Bachelor of Engineering in Computer Engineering. 
-                My approach to development is centered around{' '}
-                <span className="text-neon-pink font-semibold">efficiency and innovation</span>.
-              </p>
-              <p className="font-rajdhani text-lg text-white/60 leading-relaxed">
-                I thrive at the intersection of traditional software engineering and{' '}
-                <span className="text-neon-cyan">Prompt Engineering</span>, using AI tools to build 
-                high-quality applications at lightning speed. I'm constantly exploring new ways to 
-                optimize the development lifecycle.
-              </p>
-            </motion.div>
-
-            {/* Quote */}
-            <motion.div
-              className="relative pl-6 border-l-2 border-neon-pink"
-              initial={{ opacity: 0, x: -30 }}
-              animate={isInView ? { opacity: 1, x: 0 } : {}}
-              transition={{ duration: 0.8, delay: 0.4 }}
-            >
-              <p className="font-rajdhani text-xl md:text-2xl text-white/70 italic">
-                "The best way to predict the future is to create it—using the best tools available."
-              </p>
-              <div className="mt-4 font-orbitron text-xs text-neon-pink tracking-[3px]">
-                — Devanshu
-              </div>
-            </motion.div>
-          </motion.div>
-
-          {/* Right content - Skills visualization */}
-          <motion.div
-            initial={{ opacity: 0, x: 50 }}
-            animate={isInView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.8, delay: 0.3 }}
-          >
-            <div className="cyber-card p-8 holographic">
-              <h3 className="font-orbitron text-xl mb-8 text-neon-cyan tracking-[3px]">
-                SKILL_MATRIX
+            {/* Corner brackets - visible only on hover or click */}
+            <div className={`pointer-events-none transition-opacity duration-300 ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
+              <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-neon-cyan" />
+              <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-neon-cyan" />
+              <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-neon-cyan" />
+              <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-neon-cyan" />
+            </div>
+            {/* Top greeting */}
+            <div className="flex items-center gap-3 mb-6">
+              <h3 className="font-orbitron text-2xl md:text-3xl text-white font-bold tracking-wide">
+                Yo, I’m <span className="text-neon-cyan">Devanshu</span>
               </h3>
-              
-              <div className="space-y-6">
-                {skills.map((skill, index) => (
-                  <motion.div
-                    key={skill.name}
-                    initial={{ opacity: 0, x: 30 }}
-                    animate={isInView ? { opacity: 1, x: 0 } : {}}
-                    transition={{ duration: 0.5, delay: 0.5 + index * 0.1 }}
-                    onMouseEnter={onCursorEnter}
-                    onMouseLeave={onCursorLeave}
-                  >
-                    <div className="flex justify-between mb-2">
-                      <span className="font-rajdhani text-sm text-white/80">{skill.name}</span>
-                      <span className="font-orbitron text-sm text-neon-cyan">{skill.level}%</span>
-                    </div>
-                    <div className="h-2 bg-white/10 rounded-full overflow-hidden">
-                      <motion.div
-                        className="h-full bg-gradient-to-r from-neon-cyan to-neon-pink"
-                        initial={{ width: 0 }}
-                        animate={isInView ? { width: `${skill.level}%` } : {}}
-                        transition={{ duration: 1.5, delay: 0.7 + index * 0.1, ease: 'easeOut' }}
-                      />
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-
-              {/* Decorative elements */}
-              <div className="mt-8 pt-8 border-t border-white/10">
-                <div className="grid grid-cols-3 gap-4 text-center">
-                  {[
-                    { label: 'FOCUS', value: 'AI DEV' },
-                    { label: 'STATUS', value: 'ACTIVE' },
-                    { label: 'MODE', value: 'LEARN' },
-                  ].map((item, i) => (
-                    <motion.div
-                      key={item.label}
-                      className="p-4 bg-white/5 rounded"
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={isInView ? { opacity: 1, y: 0 } : {}}
-                      transition={{ delay: 1 + i * 0.1 }}
-                    >
-                      <div className="font-orbitron text-xs text-white/40 mb-1">{item.label}</div>
-                      <div className="font-orbitron text-sm text-neon-cyan">{item.value}</div>
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
+              <span className="text-2xl">👋</span>
             </div>
 
-            {/* Floating decoration */}
-            <motion.div
-              className="absolute -right-10 top-1/2 w-20 h-20 border border-neon-cyan/30 rotate-45"
-              animate={{ rotate: [45, 135, 45] }}
-              transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
-            />
+            {/* Body paragraphs */}
+            <div className="space-y-5 font-rajdhani text-lg md:text-xl text-white/80 leading-relaxed">
+              <p>
+                I’m a <span className="text-white font-semibold">Computer Engineering student</span> who likes building things, experimenting with tech, and figuring out how stuff works.
+              </p>
+              <p>
+                I’m currently exploring <span className="text-neon-cyan font-medium">software development</span>, <span className="text-neon-cyan font-medium">AI</span>, <span className="text-neon-cyan font-medium">automation</span>, and whatever interesting problem catches my attention. I learn mostly by building — sometimes it works, sometimes it absolutely doesn’t.
+              </p>
+            </div>
+
+            {/* Signature tagline */}
+            <div className="mt-10 pt-8 border-t border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+              <div className="flex items-center gap-3 font-orbitron text-sm md:text-base tracking-[2px] text-neon-pink">
+                <Sparkles className="w-5 h-5 text-neon-pink shrink-0" />
+                <span>Still learning. Still building. Still curious.</span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="px-3 py-1 bg-white/5 border border-white/10 rounded font-rajdhani text-xs text-white/60 tracking-wider">
+                  ENGINEERING
+                </span>
+                <span className="px-3 py-1 bg-white/5 border border-white/10 rounded font-rajdhani text-xs text-neon-cyan tracking-wider">
+                  AI & AUTOMATION
+                </span>
+              </div>
+            </div>
           </motion.div>
-        </div>
+        </motion.div>
       </div>
 
       {/* Background decoration */}
       <div className="absolute top-1/2 right-0 w-1/3 h-1/2 bg-gradient-to-l from-neon-cyan/5 to-transparent pointer-events-none" />
     </motion.section>
-    
   );
 };
 

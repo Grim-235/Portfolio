@@ -5,11 +5,11 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        'neon-cyan': '#00f5ff',
-        'neon-pink': '#ff00ff',
-        'neon-purple': '#b829dd',
-        'neon-blue': '#0080ff',
-        'neon-green': '#00ff88',
+        'neon-cyan': '#8fd3f4',
+        'neon-pink': '#ff2ecf',
+        'neon-purple': '#5b9fd4',
+        'neon-blue': '#4a9fd8',
+        'neon-green': '#7ec8e3',
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

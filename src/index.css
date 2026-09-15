@@ -5,15 +5,15 @@
 @tailwind utilities;
 
 :root {
-  --neon-cyan: #00f5ff;
-  --neon-pink: #ff00ff;
-  --neon-purple: #b829dd;
-  --neon-blue: #0080ff;
-  --neon-green: #00ff88;
-  --dark-bg: #050508;
-  --darker-bg: #020203;
-  --card-bg: rgba(10, 10, 15, 0.8);
-  --grid-color: rgba(0, 245, 255, 0.1);
+  --neon-cyan: #8fd3f4;
+  --neon-pink: #ff2ecf;
+  --neon-purple: #5b9fd4;
+  --neon-blue: #4a9fd8;
+  --neon-green: #7ec8e3;
+  --dark-bg: #05070a;
+  --darker-bg: #020304;
+  --card-bg: rgba(8, 12, 18, 0.75);
+  --grid-color: rgba(143, 211, 244, 0.08);
 }
 
 * {
@@ -89,41 +89,43 @@ body {
   opacity: 0.3;
 }
 
-/* Custom Cursor */
+/* Custom Cursor - Signature Magenta Glow Dot */
 .cursor-dot {
   position: fixed;
-  width: 8px;
-  height: 8px;
-  background: var(--neon-cyan);
+  width: 7px;
+  height: 7px;
+  background: var(--neon-pink);
   border-radius: 50%;
   pointer-events: none;
   z-index: 10000;
   transform: translate(-50%, -50%);
-  box-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-cyan);
-  transition: transform 0.1s ease;
+  box-shadow: 0 0 8px var(--neon-pink), 0 0 16px var(--neon-pink), 0 0 28px rgba(255, 46, 207, 0.5);
+  transition: transform 0.08s ease;
 }
 
 .cursor-ring {
   position: fixed;
-  width: 40px;
-  height: 40px;
-  border: 2px solid var(--neon-cyan);
+  width: 32px;
+  height: 32px;
+  border: 1.5px solid rgba(255, 46, 207, 0.4);
   border-radius: 50%;
   pointer-events: none;
   z-index: 9999;
   transform: translate(-50%, -50%);
   transition: all 0.15s ease-out;
+  box-shadow: 0 0 10px rgba(255, 46, 207, 0.15);
 }
 
 .cursor-hover .cursor-dot {
-  transform: translate(-50%, -50%) scale(2);
+  transform: translate(-50%, -50%) scale(1.6);
   background: var(--neon-pink);
-  box-shadow: 0 0 15px var(--neon-pink), 0 0 30px var(--neon-pink);
+  box-shadow: 0 0 12px var(--neon-pink), 0 0 24px var(--neon-pink), 0 0 40px rgba(255, 46, 207, 0.8);
 }
 
 .cursor-hover .cursor-ring {
-  transform: translate(-50%, -50%) scale(1.5);
-  border-color: var(--neon-pink);
+  transform: translate(-50%, -50%) scale(1.6);
+  border-color: rgba(143, 211, 244, 0.8);
+  box-shadow: 0 0 15px rgba(143, 211, 244, 0.35);
 }
 
 /* Glitch Effect */

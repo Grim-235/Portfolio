@@ -1,15 +1,6 @@
-import { useRef, useState } from 'react';
-import { motion, useInView } from 'framer-motion';
-import { 
-  Code2, 
-  Database, 
-  Brain, 
-  Rocket, 
-  GitBranch, 
-  Terminal,
-  Cpu,
-  Layers
-} from 'lucide-react';
+import { useRef } from 'react';
+import { motion, useInView, useScroll, useTransform } from 'framer-motion';
+import { Code2, Database, Brain, Terminal } from 'lucide-react';
 
 interface SkillsProps {
   onCursorEnter: () => void;
@@ -19,179 +10,217 @@ interface SkillsProps {
 const Skills = ({ onCursorEnter, onCursorLeave }: SkillsProps) => {
   const containerRef = useRef<HTMLElement>(null);
   const isInView = useInView(containerRef, { once: true, margin: '-100px' });
-  const [hoveredCard, setHoveredCard] = useState<number | null>(null);
 
-  const skillCategories = [
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ['start end', 'end start']
+  });
+
+  const opacity = useTransform(scrollYProgress, [0, 0.15, 0.85, 1], [0, 1, 1, 0]);
+  const scale = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0.94, 1, 1, 0.94]);
+  const y = useTransform(scrollYProgress, [0, 1], [50, -50]);
+
+  const categories = [
     {
-      icon: Code2,
+      number: '01',
       title: 'FRONTEND',
-      skills: ['HTML5', 'CSS3', 'JavaScript ES6+', 'React', 'Tailwind CSS'],
-      color: 'from-neon-cyan to-neon-blue',
-      description: 'Building responsive, interactive user interfaces with modern frameworks',
+      description: 'Building responsive and interactive web experiences.',
+      skills: ['HTML5', 'CSS3', 'JavaScript', 'DOM', 'Responsive Design', 'Tailwind CSS'],
+      icon: Code2,
+      align: 'left' as const,
     },
     {
+      number: '02',
+      title: 'PYTHON & DATA',
+      description: 'Using Python for development, data processing, visualization, and machine learning.',
+      skills: ['Python', 'NumPy', 'Pandas', 'Matplotlib', 'PyTorch', 'REST APIs'],
       icon: Database,
-      title: 'BACKEND',
-      skills: ['Python', 'Node.js', 'REST APIs', 'Data Structures', 'Algorithms'],
-      color: 'from-neon-pink to-neon-purple',
-      description: 'Creating robust server-side solutions and efficient data handling',
+      align: 'right' as const,
     },
     {
+      number: '03',
+      title: 'AI & AUTOMATION',
+      description: 'Building AI-powered applications and automating workflows.',
+      skills: ['AI Development', 'Prompt Engineering', 'AI APIs', 'n8n', 'Workflow Automation', 'AI-Assisted Dev'],
       icon: Brain,
-      title: 'AI & TOOLS',
-      skills: ['Prompt Engineering', 'AI-Assisted Dev', 'Git', 'VS Code', 'Cursor'],
-      color: 'from-neon-purple to-neon-cyan',
-      description: 'Leveraging AI to accelerate development and enhance productivity',
+      align: 'left' as const,
     },
     {
-      icon: Rocket,
-      title: 'PHILOSOPHY',
-      skills: ['Rapid Prototyping', 'Scalable Design', 'Clean Code', 'Best Practices'],
-      color: 'from-neon-green to-neon-cyan',
-      description: "Adaptation isn't survival, it's fluency. I don't just fit into eras, people, and environments. I learn to speak them.",
+      number: '04',
+      title: 'TOOLS & DEVOPS',
+      description: 'Tools I use to build, manage, and run projects.',
+      skills: ['Git', 'GitHub', 'Docker', 'VS Code', 'Linux CLI', 'Postman'],
+      icon: Terminal,
+      align: 'right' as const,
     },
-  ];
-
-  const techStack = [
-    { icon: Terminal, name: 'Bash', color: 'text-neon-green' },
-    { icon: GitBranch, name: 'Git', color: 'text-neon-pink' },
-    { icon: Cpu, name: 'AI/ML', color: 'text-neon-purple' },
-    { icon: Layers, name: 'Fullstack', color: 'text-neon-cyan' },
   ];
 
   return (
-    <section
+    <motion.section
       ref={containerRef}
       id="skills"
-      className="relative min-h-screen py-32 px-6"
+      className="relative min-h-screen py-32 px-6 overflow-hidden"
+      style={{ opacity, scale }}
     >
-      <div className="max-w-7xl mx-auto">
-        {/* Section header */}
+      <motion.div className="max-w-6xl mx-auto" style={{ y }}>
+        {/* Editorial Subheader inspired by reference image */}
         <motion.div
-          className="mb-20 text-center"
-          initial={{ opacity: 0, y: 50 }}
+          className="mb-24 flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/10 pb-8"
+          initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8 }}
         >
-          <div className="section-number mb-4">// 02.CAPABILITIES</div>
-          <h2 className="font-orbitron text-4xl md:text-6xl font-black">
-            <span className="text-white">MY </span>
-            <span className="text-neon-pink neon-glow-pink">ARSENAL</span>
-          </h2>
-          <p className="font-rajdhani text-lg text-white/60 mt-6 max-w-2xl mx-auto">
-            A comprehensive toolkit for building the future, powered by cutting-edge technology 
-            and AI-enhanced workflows.
+          <div>
+            <div className="flex items-center gap-2 font-orbitron text-xs text-neon-cyan tracking-[4px] mb-3">
+              <span></span>
+              <span className="text-white/40"></span>
+            </div>
+            <h2 className="font-orbitron text-3xl md:text-5xl font-black text-white tracking-wide">
+              TECHNICAL <span className="text-neon-cyan neon-glow">ARSENAL</span>
+            </h2>
+          </div>
+          <p className="font-rajdhani text-base md:text-lg text-white/50 max-w-md">
+            Of Course, I have few skills, you think i am potato like you?
           </p>
         </motion.div>
 
-        {/* Skill cards grid */}
-        <div className="grid md:grid-cols-2 gap-8 mb-20">
-          {skillCategories.map((category, index) => (
-            <motion.div
-              key={category.title}
-              className="cyber-card p-8 relative overflow-hidden group"
-              initial={{ opacity: 0, y: 50 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.6, delay: index * 0.15 }}
-              onMouseEnter={() => {
-                setHoveredCard(index);
-                onCursorEnter();
-              }}
-              onMouseLeave={() => {
-                setHoveredCard(null);
-                onCursorLeave();
-              }}
-            >
-              {/* Background gradient on hover */}
-              <motion.div
-                className={`absolute inset-0 bg-gradient-to-br ${category.color} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}
-              />
+        {/* Staggered Timeline Flow Layout */}
+        <div className="relative">
+          {/* Central Vertical Guide Line (desktop) */}
+          <div className="hidden lg:block absolute left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-neon-cyan/40 via-neon-cyan/15 to-transparent -translate-x-1/2" />
 
-              {/* Icon */}
-              <motion.div
-                className="relative mb-6"
-                animate={hoveredCard === index ? { rotate: 360, scale: 1.1 } : {}}
-                transition={{ duration: 0.5 }}
-              >
-                <div className={`w-16 h-16 rounded-lg bg-gradient-to-br ${category.color} p-0.5`}>
-                  <div className="w-full h-full bg-black/80 rounded-lg flex items-center justify-center">
-                    <category.icon className="w-8 h-8 text-white" />
+          <div className="space-y-16 lg:space-y-24">
+            {categories.map((cat, index) => {
+              const isLeft = cat.align === 'left';
+              return (
+                <div key={cat.number} className="relative">
+                  {/* Glowing Node Circle on Center Line (desktop) */}
+                  <div className="hidden lg:flex absolute left-1/2 top-10 -translate-x-1/2 w-8 h-8 rounded-full border border-neon-cyan/50 bg-black/80 items-center justify-center z-20 shadow-[0_0_15px_rgba(143,211,244,0.3)]">
+                    <div className="w-2.5 h-2.5 rounded-full bg-neon-cyan" />
+                  </div>
+
+                  {/* Horizontal Connector Line (desktop) */}
+                  <div
+                    className={`hidden lg:block absolute top-14 h-px bg-gradient-to-r z-10 ${
+                      isLeft
+                        ? 'right-1/2 from-transparent to-neon-cyan/30 w-16'
+                        : 'left-1/2 from-neon-cyan/30 to-transparent w-16'
+                    }`}
+                  />
+
+                  {/* Card Row Grid */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+                    {/* Left Column Slot */}
+                    <div className={isLeft ? 'block' : 'hidden lg:block'}>
+                      {isLeft && (
+                        <motion.div
+                          className="relative group p-8 md:p-10 rounded-xl border border-white/10 bg-white/[0.015] backdrop-blur-sm hover:border-neon-cyan/50 hover:bg-white/[0.03] hover:shadow-[0_0_35px_rgba(143,211,244,0.12)] transition-all duration-500 lg:mr-10"
+                          initial={{ opacity: 0, x: -50 }}
+                          animate={isInView ? { opacity: 1, x: 0 } : {}}
+                          transition={{ duration: 0.7, delay: index * 0.15 }}
+                          onMouseEnter={onCursorEnter}
+                          onMouseLeave={onCursorLeave}
+                        >
+                          {/* Watermark Number */}
+                          <div className="absolute top-4 right-6 font-orbitron font-black text-6xl md:text-7xl text-white/[0.03] group-hover:text-neon-cyan/[0.07] transition-colors pointer-events-none select-none">
+                            {cat.number}
+                          </div>
+
+                          {/* Corner Tech Brackets */}
+                          <div className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-neon-cyan/40 group-hover:border-neon-cyan transition-colors" />
+                          <div className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-neon-cyan/40 group-hover:border-neon-cyan transition-colors" />
+
+                          {/* Number & Arrow Header */}
+                          <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center gap-3 font-orbitron text-sm md:text-base text-neon-cyan tracking-[3px]">
+                              <span>{cat.number}</span>
+                              <span className="w-8 h-px bg-neon-cyan/50" />
+                              <span className="text-white font-bold">{cat.title}</span>
+                            </div>
+                            <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-white/50 group-hover:text-neon-cyan group-hover:bg-neon-cyan/10 transition-all">
+                              <cat.icon className="w-4 h-4" />
+                            </div>
+                          </div>
+
+                          {/* Description */}
+                          <p className="font-rajdhani text-base md:text-lg text-white/70 leading-relaxed mb-6">
+                            {cat.description}
+                          </p>
+
+                          {/* Skill Tags */}
+                          <div className="flex flex-wrap gap-2">
+                            {cat.skills.map((skill) => (
+                              <span
+                                key={skill}
+                                className="px-3.5 py-1.5 bg-white/[0.03] border border-white/10 rounded-md font-rajdhani text-sm text-white/80 group-hover:border-neon-cyan/25 hover:border-neon-cyan hover:text-neon-cyan hover:bg-neon-cyan/5 transition-all duration-300"
+                              >
+                                {skill}
+                              </span>
+                            ))}
+                          </div>
+                        </motion.div>
+                      )}
+                    </div>
+
+                    {/* Right Column Slot */}
+                    <div className={!isLeft ? 'block' : 'hidden lg:block'}>
+                      {!isLeft && (
+                        <motion.div
+                          className="relative group p-8 md:p-10 rounded-xl border border-white/10 bg-white/[0.015] backdrop-blur-sm hover:border-neon-cyan/50 hover:bg-white/[0.03] hover:shadow-[0_0_35px_rgba(143,211,244,0.12)] transition-all duration-500 lg:ml-10"
+                          initial={{ opacity: 0, x: 50 }}
+                          animate={isInView ? { opacity: 1, x: 0 } : {}}
+                          transition={{ duration: 0.7, delay: index * 0.15 }}
+                          onMouseEnter={onCursorEnter}
+                          onMouseLeave={onCursorLeave}
+                        >
+                          {/* Watermark Number */}
+                          <div className="absolute top-4 right-6 font-orbitron font-black text-6xl md:text-7xl text-white/[0.03] group-hover:text-neon-cyan/[0.07] transition-colors pointer-events-none select-none">
+                            {cat.number}
+                          </div>
+
+                          {/* Corner Tech Brackets */}
+                          <div className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-neon-cyan/40 group-hover:border-neon-cyan transition-colors" />
+                          <div className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-neon-cyan/40 group-hover:border-neon-cyan transition-colors" />
+
+                          {/* Number & Arrow Header */}
+                          <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center gap-3 font-orbitron text-sm md:text-base text-neon-cyan tracking-[3px]">
+                              <span>{cat.number}</span>
+                              <span className="w-8 h-px bg-neon-cyan/50" />
+                              <span className="text-white font-bold">{cat.title}</span>
+                            </div>
+                            <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-white/50 group-hover:text-neon-cyan group-hover:bg-neon-cyan/10 transition-all">
+                              <cat.icon className="w-4 h-4" />
+                            </div>
+                          </div>
+
+                          {/* Description */}
+                          <p className="font-rajdhani text-base md:text-lg text-white/70 leading-relaxed mb-6">
+                            {cat.description}
+                          </p>
+
+                          {/* Skill Tags */}
+                          <div className="flex flex-wrap gap-2">
+                            {cat.skills.map((skill) => (
+                              <span
+                                key={skill}
+                                className="px-3.5 py-1.5 bg-white/[0.03] border border-white/10 rounded-md font-rajdhani text-sm text-white/80 group-hover:border-neon-cyan/25 hover:border-neon-cyan hover:text-neon-cyan hover:bg-neon-cyan/5 transition-all duration-300"
+                              >
+                                {skill}
+                              </span>
+                            ))}
+                          </div>
+                        </motion.div>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </motion.div>
-
-              {/* Title */}
-              <h3 className="font-orbitron text-2xl font-bold text-white mb-4 tracking-[2px]">
-                {category.title}
-              </h3>
-
-              {/* Description */}
-              <p className="font-rajdhani text-white/60 mb-6">
-                {category.description}
-              </p>
-
-              {/* Skills list */}
-              <div className="flex flex-wrap gap-2">
-                {category.skills.map((skill, skillIndex) => (
-                  <motion.span
-                    key={skill}
-                    className="px-4 py-2 bg-white/5 border border-white/10 rounded font-rajdhani text-sm text-white/80"
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={isInView ? { opacity: 1, scale: 1 } : {}}
-                    transition={{ delay: 0.5 + skillIndex * 0.05 }}
-                    whileHover={{ 
-                      borderColor: 'rgba(0, 245, 255, 0.5)',
-                      color: '#00f5ff'
-                    }}
-                  >
-                    {skill}
-                  </motion.span>
-                ))}
-              </div>
-
-              {/* Corner accent */}
-              <div className="absolute top-4 right-4 w-8 h-8 border-t-2 border-r-2 border-neon-cyan/30" />
-            </motion.div>
-          ))}
-        </div>
-
-        {/* Tech stack row */}
-        <motion.div
-          className="cyber-card p-8"
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, delay: 0.6 }}
-        >
-          <h3 className="font-orbitron text-lg text-neon-cyan tracking-[3px] mb-8 text-center">
-            TECH_STACK
-          </h3>
-          
-          <div className="flex flex-wrap justify-center gap-8 md:gap-16">
-            {techStack.map((tech, index) => (
-              <motion.div
-                key={tech.name}
-                className="flex flex-col items-center gap-3"
-                initial={{ opacity: 0, y: 20 }}
-                animate={isInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ delay: 0.8 + index * 0.1 }}
-                onMouseEnter={onCursorEnter}
-                onMouseLeave={onCursorLeave}
-                whileHover={{ scale: 1.1 }}
-              >
-                <div className={`w-14 h-14 rounded-full bg-white/5 flex items-center justify-center border border-white/10 hover:border-neon-cyan/50 transition-colors`}>
-                  <tech.icon className={`w-7 h-7 ${tech.color}`} />
-                </div>
-                <span className="font-rajdhani text-sm text-white/60">{tech.name}</span>
-              </motion.div>
-            ))}
+              );
+            })}
           </div>
-        </motion.div>
-      </div>
-
-      {/* Background effects */}
-      <div className="absolute top-1/4 left-0 w-64 h-64 bg-neon-pink/5 rounded-full blur-[100px] pointer-events-none" />
-      <div className="absolute bottom-1/4 right-0 w-64 h-64 bg-neon-cyan/5 rounded-full blur-[100px] pointer-events-none" />
-    </section>
+        </div>
+      </motion.div>
+    </motion.section>
   );
 };
 

@@ -1,321 +1,255 @@
 import { useRef, useState } from 'react';
-import { motion, useInView } from 'framer-motion';
-import { Send, Linkedin, Github, Mail, MapPin, ArrowUpRight } from 'lucide-react';
+import { motion, useInView, useScroll, useTransform } from 'framer-motion';
+import {
+  Linkedin,
+  Github,
+  Mail,
+  Instagram,
+  ArrowUpRight,
+  Sparkles,
+  MapPin
+} from 'lucide-react';
 
 interface ContactProps {
   onCursorEnter: () => void;
   onCursorLeave: () => void;
 }
 
+const XIcon = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+  </svg>
+);
+
+const DiscordIcon = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+    <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.929 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.893.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z" />
+  </svg>
+);
+
 const Contact = ({ onCursorEnter, onCursorLeave }: ContactProps) => {
   const containerRef = useRef<HTMLElement>(null);
   const isInView = useInView(containerRef, { once: true, margin: '-100px' });
-  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [isActive, setIsActive] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    
-    // Simulate form submission
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    setIsSubmitting(false);
-    setSubmitStatus('success');
-    setFormData({ name: '', email: '', message: '' });
-    
-    setTimeout(() => setSubmitStatus('idle'), 3000);
-  };
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ['start end', 'end end']
+  });
+
+  const opacity = useTransform(scrollYProgress, [0, 0.25], [0, 1]);
+  const scale = useTransform(scrollYProgress, [0, 0.25], [0.95, 1]);
+  const y = useTransform(scrollYProgress, [0, 0.25], [40, 0]);
 
   const socialLinks = [
-    { 
-      icon: Linkedin, 
-      label: 'LinkedIn', 
+    {
+      name: 'Gmail',
+      handle: 'devanshuips@gmail.com',
+      url: 'mailto:devanshuips@gmail.com',
+      icon: Mail,
+      tag: 'INBOX',
+    },
+    {
+      name: 'LinkedIn',
+      handle: 'Devanshu Wartakar',
       url: 'https://www.linkedin.com/in/devanshu-wartakar-318ab53aa/',
-      color: 'hover:text-[#0077b5]'
+      icon: Linkedin,
+      tag: 'NETWORK',
     },
-    { 
-      icon: Github, 
-      label: 'GitHub', 
+    {
+      name: 'GitHub',
+      handle: 'Grim-235',
       url: 'https://github.com/Grim-235',
-      color: 'hover:text-white'
+      icon: Github,
+      tag: 'CODE',
     },
-    { 
-      icon: Mail, 
-      label: 'Email', 
-      url: 'mailto:devansh@example.com',
-      color: 'hover:text-neon-cyan'
+    {
+      name: 'X (Twitter)',
+      handle: '@Devanshu_Patil_',
+      url: 'https://x.com/Devanshu_Patil_',
+      icon: XIcon,
+      tag: 'UPDATES',
+    },
+    {
+      name: 'Instagram',
+      handle: 'the_devanshu_235',
+      url: 'https://www.instagram.com/the_devanshu_235',
+      icon: Instagram,
+      tag: 'SOCIAL',
+    },
+    {
+      name: 'Discord',
+      handle: '863312400979591180',
+      url: 'https://discord.com/users/863312400979591180',
+      icon: DiscordIcon,
+      tag: 'COMMUNITY',
     },
   ];
 
   return (
-    <section
+    <motion.section
       ref={containerRef}
       id="contact"
-      className="relative min-h-screen py-32 px-6"
+      className="relative py-32 px-6 overflow-hidden"
+      style={{ opacity, scale }}
     >
-      <div className="max-w-7xl mx-auto">
-        {/* Section header */}
+      <motion.div className="max-w-4xl mx-auto" style={{ y }}>
+        {/* Section Header */}
         <motion.div
-          className="mb-20 text-center"
-          initial={{ opacity: 0, y: 50 }}
+          className="mb-14 text-center"
+          initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8 }}
         >
-          <div className="section-number mb-4">// 04.CONTACT</div>
-          <h2 className="font-orbitron text-4xl md:text-6xl font-black">
-            <span className="text-white">LET'S </span>
-            <span className="text-neon-pink neon-glow-pink">CONNECT</span>
+          <div className="inline-flex items-center gap-2 font-orbitron text-xs text-neon-cyan tracking-[4px] mb-3">
+
+            <span className="text-white/40"></span>
+          </div>
+          <h2 className="font-orbitron text-4xl md:text-6xl font-black tracking-wide text-white">
+            LET'S <span className="text-neon-cyan neon-glow">CONNECT</span>
           </h2>
-          <p className="font-rajdhani text-lg text-white/60 mt-6 max-w-2xl mx-auto">
-            I'm always open to new opportunities, collaborations, or just a friendly chat 
-            about the future of AI and development.
+          <p className="font-rajdhani text-lg text-white/60 mt-4 max-w-xl mx-auto">
           </p>
         </motion.div>
 
-        <div className="grid lg:grid-cols-2 gap-16">
-          {/* Contact form */}
-          <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            animate={isInView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.8, delay: 0.2 }}
+        {/* Main Interactive Transparent Card */}
+        <motion.div
+          className={`group p-8 md:p-12 relative rounded-xl transition-all duration-500 cursor-pointer ${
+            isActive
+              ? 'bg-white/[0.02] border border-neon-cyan/50 shadow-[0_0_35px_rgba(143,211,244,0.2)]'
+              : 'bg-transparent border border-transparent hover:border-neon-cyan/40 hover:bg-white/[0.015] hover:shadow-[0_0_30px_rgba(143,211,244,0.15)]'
+          }`}
+          initial={{ opacity: 0, y: 40 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          onClick={() => setIsActive(!isActive)}
+          onMouseEnter={onCursorEnter}
+          onMouseLeave={onCursorLeave}
+        >
+          {/* Corner brackets - visible only on hover or click */}
+          <div
+            className={`pointer-events-none transition-opacity duration-300 ${
+              isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+            }`}
           >
-            <div className="cyber-card p-8 corner-accent">
-              <h3 className="font-orbitron text-xl text-neon-cyan tracking-[3px] mb-8">
-                SEND MESSAGE
-              </h3>
+            <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-neon-cyan" />
+            <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-neon-cyan" />
+            <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-neon-cyan" />
+            <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-neon-cyan" />
+          </div>
 
-              <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Name field */}
-                <div className="relative">
-                  <label className="font-rajdhani text-sm text-white/50 mb-2 block">
-                    NAME
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    required
-                    className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-4 font-rajdhani text-white placeholder-white/30 focus:border-neon-cyan focus:outline-none focus:ring-1 focus:ring-neon-cyan transition-all"
-                    placeholder="Enter your name"
-                    onMouseEnter={onCursorEnter}
-                    onMouseLeave={onCursorLeave}
-                  />
-                  <div className="absolute bottom-0 left-0 h-0.5 bg-gradient-to-r from-neon-cyan to-neon-pink w-0 focus-within:w-full transition-all duration-300" />
-                </div>
-
-                {/* Email field */}
-                <div className="relative">
-                  <label className="font-rajdhani text-sm text-white/50 mb-2 block">
-                    EMAIL
-                  </label>
-                  <input
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    required
-                    className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-4 font-rajdhani text-white placeholder-white/30 focus:border-neon-cyan focus:outline-none focus:ring-1 focus:ring-neon-cyan transition-all"
-                    placeholder="Enter your email"
-                    onMouseEnter={onCursorEnter}
-                    onMouseLeave={onCursorLeave}
-                  />
-                  <div className="absolute bottom-0 left-0 h-0.5 bg-gradient-to-r from-neon-cyan to-neon-pink w-0 focus-within:w-full transition-all duration-300" />
-                </div>
-
-                {/* Message field */}
-                <div className="relative">
-                  <label className="font-rajdhani text-sm text-white/50 mb-2 block">
-                    MESSAGE
-                  </label>
-                  <textarea
-                    value={formData.message}
-                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                    required
-                    rows={5}
-                    className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-4 font-rajdhani text-white placeholder-white/30 focus:border-neon-cyan focus:outline-none focus:ring-1 focus:ring-neon-cyan transition-all resize-none"
-                    placeholder="Enter your message..."
-                    onMouseEnter={onCursorEnter}
-                    onMouseLeave={onCursorLeave}
-                  />
-                  <div className="absolute bottom-0 left-0 h-0.5 bg-gradient-to-r from-neon-cyan to-neon-pink w-0 focus-within:w-full transition-all duration-300" />
-                </div>
-
-                {/* Submit button */}
-                <motion.button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full cyber-btn flex items-center justify-center gap-3 disabled:opacity-50"
-                  onMouseEnter={onCursorEnter}
-                  onMouseLeave={onCursorLeave}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  {isSubmitting ? (
-                    <motion.div
-                      className="w-5 h-5 border-2 border-neon-cyan border-t-transparent rounded-full"
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                    />
-                  ) : (
-                    <>
-                      <Send className="w-5 h-5" />
-                      SEND MESSAGE
-                    </>
-                  )}
-                </motion.button>
-
-                {/* Status message */}
-                {submitStatus === 'success' && (
-                  <motion.div
-                    className="p-4 bg-neon-green/10 border border-neon-green/30 rounded-lg text-neon-green font-rajdhani text-center"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                  >
-                    Message sent successfully! I'll get back to you soon.
-                  </motion.div>
-                )}
-              </form>
-            </div>
-          </motion.div>
-
-          {/* Contact info */}
-          <motion.div
-            className="space-y-8"
-            initial={{ opacity: 0, x: 50 }}
-            animate={isInView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.8, delay: 0.3 }}
-          >
-            {/* Info cards */}
-            <div className="cyber-card p-8">
-              <h3 className="font-orbitron text-xl text-neon-cyan tracking-[3px] mb-6">
-                CONTACT INFO
-              </h3>
-              
-              <div className="space-y-6">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-lg bg-neon-cyan/10 flex items-center justify-center">
-                    <MapPin className="w-6 h-6 text-neon-cyan" />
-                  </div>
-                  <div>
-                    <p className="font-rajdhani text-sm text-white/50">LOCATION</p>
-                    <p className="font-rajdhani text-white">India</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-lg bg-neon-pink/10 flex items-center justify-center">
-                    <Mail className="w-6 h-6 text-neon-pink" />
-                  </div>
-                  <div>
-                    <p className="font-rajdhani text-sm text-white/50">EMAIL</p>
-                    <p className="font-rajdhani text-white">devanshuips@gmail.com</p>
-                  </div>
-                </div>
-              </div>
+          {/* Card Top Sub-bar */}
+          <div className="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-white/10 mb-8">
+            <div className="flex items-center gap-3">
+              <span className="relative flex h-3 w-3">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-neon-cyan opacity-75" />
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-neon-cyan" />
+              </span>
+              <span className="font-orbitron text-xs tracking-[2px] text-neon-cyan font-bold">
+                Yeah!, If you wanna connect...
+              </span>
             </div>
 
-            {/* Social links */}
-            <div className="cyber-card p-8">
-              <h3 className="font-orbitron text-xl text-neon-cyan tracking-[3px] mb-6">
-                SOCIALLINKS
-              </h3>
-              
-              <div className="space-y-4">
-                {socialLinks.map((link, index) => (
-                  <motion.a
-                    key={link.label}
-                    href={link.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-between p-4 bg-white/5 rounded-lg group hover:bg-white/10 transition-colors"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={isInView ? { opacity: 1, y: 0 } : {}}
-                    transition={{ delay: 0.5 + index * 0.1 }}
-                    onMouseEnter={onCursorEnter}
-                    onMouseLeave={onCursorLeave}
-                    whileHover={{ x: 5 }}
-                  >
-                    <div className="flex items-center gap-4">
-                      <link.icon className={`w-6 h-6 text-white/60 ${link.color} transition-colors`} />
-                      <span className="font-rajdhani text-white group-hover:text-neon-cyan transition-colors">
-                        {link.label}
-                      </span>
+            <div className="flex items-center gap-2 text-white/50 font-rajdhani text-sm">
+              <MapPin className="w-3.5 h-3.5 text-neon-cyan" />
+              <span>Maharashtra, India</span>
+            </div>
+          </div>
+
+          {/* Social Channels 2-Col / 3-Col Grid */}
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
+            {socialLinks.map((social) => (
+              <motion.a
+                key={social.name}
+                href={social.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="p-4 md:p-5 rounded-lg border border-white/5 hover:border-neon-cyan/60 bg-white/[0.02] hover:bg-neon-cyan/[0.06] transition-all duration-300 flex items-center justify-between group/link"
+                whileHover={{ y: -4, scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <div className="flex items-center gap-3.5 min-w-0">
+                  <div className="w-11 h-11 rounded-lg bg-white/5 border border-white/10 group-hover/link:border-neon-cyan/50 group-hover/link:bg-neon-cyan/10 group-hover/link:text-neon-cyan flex items-center justify-center text-white/70 transition-all duration-300 flex-shrink-0">
+                    <social.icon className="w-5 h-5" />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2">
+                      <h4 className="font-orbitron text-sm font-bold text-white group-hover/link:text-neon-cyan transition-colors">
+                        {social.name}
+                      </h4>
                     </div>
-                    <ArrowUpRight className="w-5 h-5 text-white/30 group-hover:text-neon-cyan transition-colors" />
-                  </motion.a>
-                ))}
-              </div>
-            </div>
-
-            {/* Status card */}
-            <div className="cyber-card p-6 holographic">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-orbitron text-xs text-white/50 tracking-[2px]">CURRENT STATUS</p>
-                  <p className="font-rajdhani text-neon-green text-lg">Learning and Building something Every Week</p>
+                    <p className="font-rajdhani text-xs md:text-sm text-white/50 truncate group-hover/link:text-white/80 transition-colors">
+                      {social.handle}
+                    </p>
+                  </div>
                 </div>
-                <motion.div
-                  className="w-4 h-4 bg-neon-green rounded-full"
-                  animate={{ 
-                    boxShadow: [
-                      '0 0 0 0 rgba(0, 255, 136, 0.4)',
-                      '0 0 0 10px rgba(0, 255, 136, 0)',
-                      '0 0 0 0 rgba(0, 255, 136, 0)'
-                    ]
-                  }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                />
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      </div>
 
-      {/* Footer */}
-      <motion.footer
-        className="mt-32 pt-16 border-t border-white/10"
-        initial={{ opacity: 0 }}
-        animate={isInView ? { opacity: 1 } : {}}
-        transition={{ delay: 0.8 }}
-      >
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-8">
+                <div className="text-white/30 group-hover/link:text-neon-cyan transition-colors pl-2 flex-shrink-0">
+                  <ArrowUpRight className="w-4 h-4 transition-transform group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5" />
+                </div>
+              </motion.a>
+            ))}
+          </div>
+
+          {/* Bottom Card Footer with Signature Tagline */}
+          <div className="mt-10 pt-6 border-t border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-2.5 font-orbitron text-xs md:text-sm tracking-[2px] text-neon-cyan">
+              <Sparkles className="w-4 h-4 text-neon-cyan shrink-0" />
+              <span>Quote for ya,</span>.
+              <span>How dare I crave connection when all I have to offer is Silence.</span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <span className="px-3 py-1 bg-white/5 border border-white/10 rounded font-rajdhani text-xs text-white/60 tracking-wider">
+                COMMUNICATION
+              </span>
+              <span className="px-3 py-1 bg-white/5 border border-white/10 rounded font-rajdhani text-xs text-neon-cyan tracking-wider">
+                TRANSMISSION
+              </span>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Footer */}
+        <motion.footer
+          className="mt-32 pt-16 border-t border-white/10"
+          initial={{ opacity: 0 }}
+          animate={isInView ? { opacity: 1 } : {}}
+          transition={{ delay: 0.5 }}
+        >
+          <div className="flex flex-col md:flex-row justify-between items-center gap-8 text-center md:text-left">
             {/* Logo */}
-            <div className="font-orbitron text-2xl font-bold">
-              <span className="text-neon-cyan">DEVANSH</span>
-              <span className="text-neon-pink">.W</span>
+            <div className="font-orbitron text-2xl font-bold tracking-wider">
+              <span className="text-white">Yeah,</span>
+              <span className="text-neon-cyan"> That's it.</span>
             </div>
 
             {/* Copyright */}
-            <p className="font-rajdhani text-white/40 text-sm">
-              &copy; 2026 Devansh Wartakar. Built with AI & Passion.
+            <p className="font-rajdhani text-white/50 text-base">
+              &copy; 2026 Built by Devanshu Wartakar.
             </p>
 
             {/* Back to top */}
             <motion.button
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-              className="flex items-center gap-2 font-orbitron text-xs text-white/40 hover:text-neon-cyan transition-colors"
+              className="flex items-center gap-2 font-orbitron text-xs text-white/50 hover:text-neon-cyan transition-colors"
               onMouseEnter={onCursorEnter}
               onMouseLeave={onCursorLeave}
               whileHover={{ y: -3 }}
             >
-              BACK TO TOP
-              <motion.div
-                animate={{ y: [0, -5, 0] }}
-                transition={{ duration: 1.5, repeat: Infinity }}
-              >
-                <ArrowUpRight className="w-4 h-4 rotate-[-45deg]" />
-              </motion.div>
+              <span>BACK TO TOP</span>
+              <ArrowUpRight className="w-4 h-4 rotate-[-45deg]" />
             </motion.button>
           </div>
-        </div>
-      </motion.footer>
+        </motion.footer>
+      </motion.div>
 
-      {/* Background effects */}
-      <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-neon-pink/5 rounded-full blur-[150px] pointer-events-none" />
-    </section>
+      {/* Subtle Ambient Background Accent */}
+      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 w-[500px] h-[250px] bg-neon-cyan/[0.03] rounded-full blur-[140px] pointer-events-none" />
+    </motion.section>
   );
 };
 
 export default Contact;
+

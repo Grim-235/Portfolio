@@ -2,195 +2,180 @@ import { useRef, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
-interface ParticlesProps {
-  count?: number;
-}
+// 3D Perspective Digital Floor Grid
+const PerspectiveFloor = () => {
+  const linesRef = useRef<THREE.LineSegments>(null);
 
-const Particles = ({ count = 200 }: ParticlesProps) => {
-  const mesh = useRef<THREE.Points>(null);
-  const linesMesh = useRef<THREE.LineSegments>(null);
+  const geometry = useMemo(() => {
+    const points: THREE.Vector3[] = [];
+    const size = 32;
+    const divisions = 28;
+    const step = size / divisions;
+    const y = -4.2;
 
-  const [positions, velocities] = useMemo(() => {
-    const positions = new Float32Array(count * 3);
-    const velocities = new Float32Array(count * 3);
-    
-    for (let i = 0; i < count; i++) {
-      positions[i * 3] = (Math.random() - 0.5) * 20;
-      positions[i * 3 + 1] = (Math.random() - 0.5) * 20;
-      positions[i * 3 + 2] = (Math.random() - 0.5) * 10;
-      
-      velocities[i * 3] = (Math.random() - 0.5) * 0.01;
-      velocities[i * 3 + 1] = (Math.random() - 0.5) * 0.01;
-      velocities[i * 3 + 2] = (Math.random() - 0.5) * 0.005;
+    // Longitudinal lines (converging in perspective)
+    for (let i = -divisions / 2; i <= divisions / 2; i++) {
+      points.push(new THREE.Vector3(i * step * 1.6, y, -18));
+      points.push(new THREE.Vector3(i * step * 0.5, y, 8));
     }
-    
-    return [positions, velocities];
-  }, [count]);
 
-  const linePositions = useMemo(() => {
-    return new Float32Array(count * count * 6);
-  }, [count]);
-
-  const lineColors = useMemo(() => {
-    return new Float32Array(count * count * 6);
-  }, [count]);
-
-  useFrame(() => {
-    if (!mesh.current) return;
-    
-    const positionArray = mesh.current.geometry.attributes.position.array as Float32Array;
-    
-    for (let i = 0; i < count; i++) {
-      positionArray[i * 3] += velocities[i * 3];
-      positionArray[i * 3 + 1] += velocities[i * 3 + 1];
-      positionArray[i * 3 + 2] += velocities[i * 3 + 2];
-      
-      // Boundary check
-      if (Math.abs(positionArray[i * 3]) > 10) velocities[i * 3] *= -1;
-      if (Math.abs(positionArray[i * 3 + 1]) > 10) velocities[i * 3 + 1] *= -1;
-      if (Math.abs(positionArray[i * 3 + 2]) > 5) velocities[i * 3 + 2] *= -1;
+    // Horizontal lines
+    for (let j = 0; j <= divisions; j++) {
+      const z = -18 + j * step;
+      const spread = 1 + ((z + 18) / size) * 1.4;
+      points.push(new THREE.Vector3(-18 * spread, y, z));
+      points.push(new THREE.Vector3(18 * spread, y, z));
     }
-    
-    mesh.current.geometry.attributes.position.needsUpdate = true;
-    mesh.current.rotation.y += 0.0005;
 
-    // Update connection lines
-    if (linesMesh.current) {
-      const linePos = linesMesh.current.geometry.attributes.position.array as Float32Array;
-      const lineCol = linesMesh.current.geometry.attributes.color.array as Float32Array;
-      let lineIndex = 0;
-      
-      for (let i = 0; i < count; i++) {
-        for (let j = i + 1; j < count; j++) {
-          const dx = positionArray[i * 3] - positionArray[j * 3];
-          const dy = positionArray[i * 3 + 1] - positionArray[j * 3 + 1];
-          const dz = positionArray[i * 3 + 2] - positionArray[j * 3 + 2];
-          const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
-          
-          if (dist < 2 && lineIndex < linePositions.length - 6) {
-            linePos[lineIndex] = positionArray[i * 3];
-            linePos[lineIndex + 1] = positionArray[i * 3 + 1];
-            linePos[lineIndex + 2] = positionArray[i * 3 + 2];
-            linePos[lineIndex + 3] = positionArray[j * 3];
-            linePos[lineIndex + 4] = positionArray[j * 3 + 1];
-            linePos[lineIndex + 5] = positionArray[j * 3 + 2];
-            
-            const alpha = 1 - dist / 2;
-            lineCol[lineIndex] = 0;
-            lineCol[lineIndex + 1] = 0.96 * alpha;
-            lineCol[lineIndex + 2] = 1 * alpha;
-            lineCol[lineIndex + 3] = 0;
-            lineCol[lineIndex + 4] = 0.96 * alpha;
-            lineCol[lineIndex + 5] = 1 * alpha;
-            
-            lineIndex += 6;
-          }
-        }
-      }
-      
-      // Clear remaining lines
-      for (let i = lineIndex; i < linePositions.length; i++) {
-        linePos[i] = 0;
-      }
-      
-      linesMesh.current.geometry.attributes.position.needsUpdate = true;
-      linesMesh.current.geometry.attributes.color.needsUpdate = true;
+    const geo = new THREE.BufferGeometry().setFromPoints(points);
+    return geo;
+  }, []);
+
+  useFrame((state) => {
+    if (linesRef.current) {
+      // Subtle pulse
+      const material = linesRef.current.material as THREE.LineBasicMaterial;
+      material.opacity = 0.14 + Math.sin(state.clock.elapsedTime * 0.7) * 0.04;
     }
   });
 
-  const positionAttribute = useMemo(() => {
-    return new THREE.BufferAttribute(positions, 3);
-  }, [positions]);
-
-  const linePositionAttribute = useMemo(() => {
-    return new THREE.BufferAttribute(linePositions, 3);
-  }, [linePositions]);
-
-  const lineColorAttribute = useMemo(() => {
-    return new THREE.BufferAttribute(lineColors, 3);
-  }, [lineColors]);
-
   return (
-    <>
-      <points ref={mesh}>
-        <bufferGeometry>
-          <primitive object={positionAttribute} attach="attributes-position" />
-        </bufferGeometry>
-        <pointsMaterial
-          size={0.05}
-          color="#00f5ff"
-          transparent
-          opacity={0.8}
-          sizeAttenuation
-        />
-      </points>
-      
-      <lineSegments ref={linesMesh}>
-        <bufferGeometry>
-          <primitive object={linePositionAttribute} attach="attributes-position" />
-          <primitive object={lineColorAttribute} attach="attributes-color" />
-        </bufferGeometry>
-        <lineBasicMaterial
-          vertexColors
-          transparent
-          opacity={0.3}
-          blending={THREE.AdditiveBlending}
-        />
-      </lineSegments>
-    </>
+    <lineSegments ref={linesRef} geometry={geometry}>
+      <lineBasicMaterial
+        color="#8fd3f4"
+        transparent
+        opacity={0.16}
+        blending={THREE.AdditiveBlending}
+        depthWrite={false}
+      />
+    </lineSegments>
   );
 };
 
-const FloatingShapes = () => {
-  const groupRef = useRef<THREE.Group>(null);
+// Subtle upper perspective horizon guide lines for expansive depth
+const PerspectiveHorizon = () => {
+  const linesRef = useRef<THREE.LineSegments>(null);
 
-  useFrame(({ clock }) => {
-    if (groupRef.current) {
-      groupRef.current.rotation.x = Math.sin(clock.getElapsedTime() * 0.3) * 0.1;
-      groupRef.current.rotation.y = clock.getElapsedTime() * 0.1;
+  const geometry = useMemo(() => {
+    const points: THREE.Vector3[] = [];
+    const count = 12;
+    const y = 4.8;
+
+    for (let i = -count / 2; i <= count / 2; i++) {
+      points.push(new THREE.Vector3(i * 3.5, y, -18));
+      points.push(new THREE.Vector3(i * 1.2, y, 6));
     }
+
+    return new THREE.BufferGeometry().setFromPoints(points);
+  }, []);
+
+  return (
+    <lineSegments ref={linesRef} geometry={geometry}>
+      <lineBasicMaterial
+        color="#4a9fd8"
+        transparent
+        opacity={0.06}
+        blending={THREE.AdditiveBlending}
+        depthWrite={false}
+      />
+    </lineSegments>
+  );
+};
+
+// Ambient floating dust particles / stars
+const AmbientDust = ({ count = 140 }) => {
+  const pointsRef = useRef<THREE.Points>(null);
+
+  const [positions, velocities] = useMemo(() => {
+    const pos = new Float32Array(count * 3);
+    const vel = new Float32Array(count * 3);
+
+    for (let i = 0; i < count; i++) {
+      pos[i * 3] = (Math.random() - 0.5) * 26;
+      pos[i * 3 + 1] = (Math.random() - 0.5) * 18;
+      pos[i * 3 + 2] = (Math.random() - 0.5) * 18 - 2;
+
+      vel[i * 3] = (Math.random() - 0.5) * 0.003;
+      vel[i * 3 + 1] = (Math.random() - 0.5) * 0.004;
+      vel[i * 3 + 2] = (Math.random() - 0.5) * 0.003;
+    }
+    return [pos, vel];
+  }, [count]);
+
+  useFrame(() => {
+    if (!pointsRef.current) return;
+    const array = pointsRef.current.geometry.attributes.position.array as Float32Array;
+
+    for (let i = 0; i < count; i++) {
+      array[i * 3] += velocities[i * 3];
+      array[i * 3 + 1] += velocities[i * 3 + 1];
+      array[i * 3 + 2] += velocities[i * 3 + 2];
+
+      if (Math.abs(array[i * 3]) > 13) velocities[i * 3] *= -1;
+      if (Math.abs(array[i * 3 + 1]) > 9) velocities[i * 3] *= -1;
+      if (Math.abs(array[i * 3 + 2] + 2) > 10) velocities[i * 3 + 2] *= -1;
+    }
+    pointsRef.current.geometry.attributes.position.needsUpdate = true;
+  });
+
+  return (
+    <points ref={pointsRef}>
+      <bufferGeometry>
+        <bufferAttribute
+          attach="attributes-position"
+          args={[positions, 3]}
+        />
+      </bufferGeometry>
+      <pointsMaterial
+        size={0.065}
+        color="#cfeeff"
+        transparent
+        opacity={0.65}
+        blending={THREE.AdditiveBlending}
+        sizeAttenuation
+      />
+    </points>
+  );
+};
+
+// Main Scene Container with interactive mouse parallax
+const Scene = () => {
+  const groupRef = useRef<THREE.Group>(null);
+  const mouseTarget = useRef({ x: 0, y: 0 });
+
+  useFrame(({ pointer }) => {
+    if (!groupRef.current) return;
+
+    // Smooth lerp mouse parallax
+    mouseTarget.current.x += (pointer.x * 0.25 - mouseTarget.current.x) * 0.05;
+    mouseTarget.current.y += (pointer.y * 0.15 - mouseTarget.current.y) * 0.05;
+
+    groupRef.current.rotation.y = mouseTarget.current.x;
+    groupRef.current.rotation.x = -mouseTarget.current.y;
   });
 
   return (
     <group ref={groupRef}>
-      {/* Floating octahedron */}
-      <mesh position={[-5, 2, -5]}>
-        <octahedronGeometry args={[0.5, 0]} />
-        <meshBasicMaterial color="#ff00ff" wireframe transparent opacity={0.5} />
-      </mesh>
-      
-      {/* Floating icosahedron */}
-      <mesh position={[5, -2, -3]}>
-        <icosahedronGeometry args={[0.4, 0]} />
-        <meshBasicMaterial color="#00f5ff" wireframe transparent opacity={0.5} />
-      </mesh>
-      
-      {/* Floating torus */}
-      <mesh position={[3, 3, -6]}>
-        <torusGeometry args={[0.6, 0.2, 8, 20]} />
-        <meshBasicMaterial color="#b829dd" wireframe transparent opacity={0.4} />
-      </mesh>
-      
-      {/* Floating cube */}
-      <mesh position={[-4, -3, -4]}>
-        <boxGeometry args={[0.8, 0.8, 0.8]} />
-        <meshBasicMaterial color="#00ff88" wireframe transparent opacity={0.4} />
-      </mesh>
+      <PerspectiveFloor />
+      <PerspectiveHorizon />
+      <AmbientDust count={140} />
     </group>
   );
 };
 
 const ParticleBackground = () => {
   return (
-    <div className="fixed inset-0 z-0">
+    <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
       <Canvas
-        camera={{ position: [0, 0, 8], fov: 75 }}
-        dpr={[1, 2]}
-        gl={{ antialias: true, alpha: true }}
+        camera={{ position: [0, 0, 6], fov: 60 }}
+        dpr={[1, 1.5]}
+        gl={{
+          antialias: true,
+          alpha: true,
+          powerPreference: 'high-performance',
+        }}
       >
-        <ambientLight intensity={0.5} />
-        <Particles count={150} />
-        <FloatingShapes />
+        <Scene />
       </Canvas>
     </div>
   );
